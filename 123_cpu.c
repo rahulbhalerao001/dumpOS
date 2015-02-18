@@ -18,29 +18,33 @@ int main(int argc, char **argv)
 {
   //1. Measurement Overhead : Time Measurement Overhead
   int i,j;
-  unsigned long long start,end,tsum=0, timeMeasurementOverhead, sum[8]={0,0,0,0,0,0,0,0};
+  unsigned long long int start,end,tsum=0, timeMeasurementOverhead, sum[8], temp;
+  for(i =0; i < 8; i++){
+   	sum[i] = 0;
+  }
   for(i=0; i<ITERATIONS; i++) {
 	start = rdtsc();
+//	temp = rdtsc();
 	end = rdtsc();
 	tsum += end-start;
   }
-  timeMeasurementOverhead = (unsigned long long int) tsum/(double)ITERATIONS;
+  timeMeasurementOverhead = tsum/ITERATIONS;
   //printf("Time measurement overhead %ld\n", timeMeasurementOverhead);
   printf("%f\n", timeMeasurementOverhead/CPU_FREQ);
   
   //1. Measurement Overhead : Loop Measurement Overhead
-   
+  tsum = 0;   
   for(i=0; i<ITERATIONS; i++) {
   	start=rdtsc();
 	for(j=0; j < 10;j++){}
   	end=rdtsc();
 	tsum += end-start;
  }
-  printf("%f\n", ((tsum/(ITERATIONS)) - timeMeasurementOverhead)/CPU_FREQ);
+  printf("%f\n", ((tsum/(ITERATIONS)) - timeMeasurementOverhead)/(CPU_FREQ*10));
 
 //  printf("Loop overhead: %llu\n", (end-start-timeMeasurementOverhead)/ITERATIONS);
   
-  for(i=0; i<ITERATIONS; i++) {
+  for(i=0; i< ITERATIONS; i++) {
      start=rdtsc();
      function0();
      end=rdtsc();
@@ -85,7 +89,9 @@ int main(int argc, char **argv)
 
   }
   for(i=0; i<8; i++) {
-     printf("%f\n",(sum[i]- timeMeasurementOverhead)/ITERATIONS*CPU_FREQ);
+     printf("%f\n",(((sum[i]/(CPU_FREQ*ITERATIONS)))));
+
+//     printf("%f\n",(((sum[i]/ITERATIONS)- timeMeasurementOverhead)/CPU_FREQ));
      //printf("Overhead with %d arguments: %ld\n", i, (long int) (sum[i]/(double)ITERATIONS) - timeMeasurementOverhead);
  }
 
@@ -94,17 +100,17 @@ int main(int argc, char **argv)
   getpid();
   end=rdtsc();
 //  printf("Overhead of system call getpid: %llu\n", end-start-timeMeasurementOverhead);
-  printf("%f\n", (end-start-timeMeasurementOverhead)/(double)CPU_FREQ);
+  printf("%f\n", (end-start-timeMeasurementOverhead)/CPU_FREQ);
   start=rdtsc();
   time(NULL);
   end=rdtsc();
 //  printf("Overhead of system call getpid: %llu\n", end-start-timeMeasurementOverhead);
-  printf("%f\n", (end-start-timeMeasurementOverhead)/(double)CPU_FREQ);
+  printf("%f\n", (end-start-timeMeasurementOverhead)/CPU_FREQ);
 
   start=rdtsc();
   sleep(1);
   end=rdtsc();
 //  printf("Overhead of system call getpid: %llu\n", end-start-timeMeasurementOverhead);
-  printf("%f\n", ((end-start-timeMeasurementOverhead)/(double)CPU_FREQ)- 1000000000);
+  printf("%f\n", ((end-start-timeMeasurementOverhead)/CPU_FREQ)- 1000000000);
 
 }
