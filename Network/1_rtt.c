@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    serv_addr.sin_port = htons(5002); 
+    serv_addr.sin_port = htons(5010); 
 
     bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)); //bind server address to socket 
 
@@ -37,13 +37,17 @@ int main(int argc, char *argv[])
 	s_t = rdtsc();	
 	connfd = accept(listenfd, (struct sockaddr*)NULL, NULL); 	// 3-way handshake
 	e_t = rdtsc();	
-	char msg[] = "lmnpqrs";
-	char recvBuf[8];
+	char msg[44] = "lmnpqrslmnpqrslmnpqrslmnpqrslmnpqrslmnpqrsi";
+	char recvBuf[44];
 	for(i =0; i < 600; i++){	
-		if(recv(connfd, recvBuf, 8 * sizeof(char), 0) != 8)
+		if(recv(connfd, recvBuf, 44 * sizeof(char), 0) != 44){
+			printf("recv issues\n");
 			break;
-		if(send(connfd, msg, sizeof(msg),0) != 8)
+		}
+		if(send(connfd, msg, sizeof(msg),0) != 44){
+			printf("send issue\n");
 			break;
+		}
 	}
 	printf("Connection setup time %f\n", (e_t - s_t)/(CPU_FREQ*1000000));
 	s_t = rdtsc();	
